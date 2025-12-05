@@ -1,0 +1,130 @@
+﻿@model Busticket.Models.PagoViewModel
+
+@{
+    ViewBag.Title = "Busticket - Pago";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>BusTicket - Pago</title>
+</head>
+<body class="font-sans bg-white flex justify-center py-12">
+
+    <div class="w-full max-w-5xl p-6 flex flex-col lg:flex-row gap-12 scale-90">
+
+        <!-- IZQUIERDA - Formulario de pago -->
+        <div class="flex-1 bg-white p-6 rounded-xl shadow-lg">
+            <h1 class="text-4xl md:text-5xl text-[#284D67] font-bold">BusTicket</h1>
+
+            <div class="mt-10">
+                <h1 class="text-2xl md:text-4xl font-semibold">Realiza tu pago</h1>
+                <h4 class="text-base md:text-xl text-gray-600 mt-6">
+                    Introduce los datos de tu tarjeta para realizar el pago. <br>
+                    Serás redirigido a la página de autorización de tu banco.
+                </h4>
+            </div>
+
+            <form asp-action="FinalizarPago" method="post" class="mt-10 space-y-6">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="RutaId" value="@Model.RutaId" />
+
+                <div>
+                    <label for="nombre" class="text-lg text-gray-700">Nombre</label><br>
+                    <input type="text" id="nombre" name="Nombre" required placeholder="Nombre en la tarjeta"
+                           class="w-full h-14 px-4 text-lg md:text-2xl rounded-lg bg-gray-200 focus:outline-none">
+                </div>
+
+                <div>
+                    <label for="tarjeta" class="text-lg text-gray-700">Número de tarjeta</label><br>
+                    <div class="relative w-full">
+                        <img src="./Imagenes/Mastercard-Logo.wine.png" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 md:w-12">
+                        <input type="text" id="tarjeta" name="NumeroTarjeta" maxlength="19" inputmode="numeric" required placeholder="xxxx-xxxx-xxxx-xxxx"
+                               class="w-full h-14 md:h-16 pl-16 md:pl-20 text-lg md:text-2xl rounded-lg bg-gray-200 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="flex gap-6 md:gap-12">
+                    <div class="flex-1">
+                        <label for="validez" class="text-lg text-gray-700">Válido hasta</label><br>
+                        <input type="text" id="validez" name="Validez" value="03 / 25" readonly
+                               class="w-full h-14 md:h-16 px-4 text-lg md:text-2xl rounded-lg bg-gray-200 focus:outline-none">
+                    </div>
+
+                    <div class="flex-1">
+                        <label for="cvc" class="text-lg text-gray-700">CVC</label><br>
+                        <input type="text" id="cvc" name="CVC" maxlength="3" required placeholder="XXX"
+                               class="w-full h-14 md:h-16 px-4 text-lg md:text-2xl rounded-lg bg-gray-200 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="descuento" class="text-lg text-gray-700">Código de descuento</label><br>
+                    <div class="relative w-full">
+                        <input type="text" id="descuento" name="Descuento" placeholder="xxxxxxx-20-OFF"
+                               class="w-full h-14 md:h-16 px-4 text-lg md:text-2xl rounded-lg bg-gray-200 focus:outline-none">
+                        <a href="#" class="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 font-bold text-[#284D67] text-lg md:text-xl">Aplicar</a>
+                    </div>
+                </div>
+
+                <!-- Hidden inputs para los asientos seleccionados -->
+                @if (Model.Asientos != null && Model.Asientos.Count > 0)
+                {
+                    @foreach (var asiento in Model.Asientos)
+                    {
+                        <input type="hidden" name="Asientos" value="@asiento" />
+                    }
+                }
+
+                <div class="mt-8">
+                    <button type="submit" class="w-36 h-12 rounded-full bg-[#284D67] text-white text-lg md:text-xl hover:opacity-50 transition duration-500">
+                        Pagar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- DERECHA - Resumen de compra -->
+        <div class="flex-1 bg-gray-100 p-6 rounded-xl border border-gray-200 shadow-lg">
+            <h2 class="text-gray-600 text-xl md:text-2xl">Detalles de compra</h2>
+            <h1 class="text-3xl md:text-5xl mt-4">$@Model.Total.ToString("N0") COP</h1>
+
+            <div class="mt-6 space-y-2 text-gray-600 text-sm md:text-base">
+                <div class="flex justify-between"><span>Trayecto:</span> <span>@Model.Origen - @Model.Destino</span></div>
+                <div class="flex justify-between"><span>Fecha:</span> <span>@Model.Fecha</span></div>
+                <div class="flex justify-between"><span>Hora de salida:</span> <span>@Model.Hora</span></div>
+                <div class="flex justify-between"><span>Empresa:</span> <span>@Model.Empresa</span></div>
+                <div class="flex justify-between"><span>Duración aproximada:</span> <span>@Model.Duracion</span></div>
+            </div>
+
+            <div class="flex items-center my-8">
+                <div class="flex-1 h-px bg-black"></div>
+                <span class="mx-4 text-xl text-black"></span>
+                <div class="flex-1 h-px bg-black"></div>
+            </div>
+
+            <div class="space-y-1 text-black text-sm md:text-base">
+                <div class="flex justify-between"><span>IVA:</span> <span class="font-light">$0.00</span></div>
+                <div class="flex justify-between"><span>Total:</span> <span class="font-light">$@Model.Total.ToString("N0")</span></div>
+            </div>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            title: '¡Éxito!',
+            text: 'Pago realizado correctamente',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    </script>
+
+
+</body>
+</html>

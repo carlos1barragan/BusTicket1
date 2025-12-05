@@ -1,0 +1,96 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busticket - Registro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="w-full h-full bg-gray-100 flex items-center justify-center">
+
+    <!-- CARD CONTENEDOR -->
+    <div class="flex w-[1000px] h-[700px] bg-white rounded-2xl shadow-lg overflow-hidden">
+
+        <!-- IZQUIERDA (FORM) -->
+        <div class="flex flex-col justify-center px-16 py-10 w-1/2">
+
+            <h1 class="text-3xl font-bold text-[#0A2A43] mb-4">Busticket</h1>
+
+            <h2 class="text-3xl font-bold">¡Crea tu cuenta!</h2>
+            <p class="text-gray-600 mt-2">Ingresa tus datos para registrarte</p>
+
+            <form method="post" class="mt-8 space-y-4">
+
+                <div>
+                    <label class="font-medium">Nombre completo</label>
+                    <input name="Nombre" class="w-full border border-gray-300 rounded-lg p-3 mt-1" placeholder="Ingresa tu nombre" />
+                </div>
+
+                <div>
+                    <label class="font-medium">Correo electrónico</label>
+                    <input name="Email" type="email" class="w-full border border-gray-300 rounded-lg p-3 mt-1" placeholder="Ingresa tu correo" />
+                </div>
+
+                <div>
+                    <label class="font-medium">Contraseña</label>
+                    <input name="Password" type="password" class="w-full border border-gray-300 rounded-lg p-3 mt-1" placeholder="Ingresa tu contraseña" />
+                </div>
+
+                <div>
+                    <label class="font-medium">Confirmar contraseña</label>
+                    <input name="ConfirmPassword" type="password" class="w-full border border-gray-300 rounded-lg p-3 mt-1" placeholder="Confirma tu contraseña" />
+                </div>
+
+                <button class="w-full bg-[#143A58] text-white py-3 rounded-lg mt-4 font-medium hover:bg-[#0F2B45]">
+                    Registrarse
+                </button>
+            </form>
+
+            <!-- Botones de registro social -->
+            <div class="mt-6 flex gap-4 justify-center">
+
+                <button class="flex-1 border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100">
+                    <img src="/img/google.svg" class="w-5" />
+                    Google
+                </button>
+
+                <button class="flex-1 border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100">
+                    <img src="/img/apple.svg" class="w-5" />
+                    Apple
+                </button>
+
+            </div>
+
+            <p class="text-center text-gray-600 text-sm mt-6">
+                ¿Ya tienes cuenta?
+                <a href="/Auth/Login" class="text-blue-600 font-medium hover:underline">
+                    Iniciar sesión
+                </a>
+            </p>
+
+        </div>
+
+        <!-- DERECHA (IMAGEN) -->
+        <div class="w-1/2 min-h-[400px]">
+            <img src="https://res.cloudinary.com/dbt58u6ag/image/upload/v1764884373/chris-lee-70l1tDAI6rM-unsplash_2_b4fmff.png"
+                 class="w-full h-full object-cover rounded-lg"
+                 alt="Imagen de ruta" />
+        </div>
+
+
+    </div>
+
+</body>
+</html>

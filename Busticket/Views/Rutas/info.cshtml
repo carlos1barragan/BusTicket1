@@ -1,0 +1,277 @@
+﻿@using Busticket.Extensions
+@model Busticket.Models.RutaDetalleViewModel
+
+@{
+    ViewBag.Title = "Busticket - Home";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Detalle de Ruta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- HEADER -->
+    <header class="py-6 bg-white shadow-md">
+        <div class="w-[95%] max-w-[1400px] mx-auto flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="text-3xl font-extrabold text-[#284D67] cursor-pointer">
+                <a href="/">Busticket</a>
+            </div>
+
+            <!-- Menú -->
+            <nav class="flex gap-12">
+                <a href="/Rutas/index" class="text-base font-medium hover:text-[#002C53] hover:font-bold">Destinos</a>
+                <a href="#" class="text-base font-medium hover:text-[#002C53] hover:font-bold">Planes</a>
+                <a href="#" class="text-base font-medium hover:text-[#002C53] hover:font-bold">Descuentos</a>
+            </nav>
+
+            <!-- Iconos -->
+            <div class="flex items-center">
+
+                <!-- Carrito con dropdown funcional -->
+                <div class="relative ml-4">
+                    <button id="btnCarrito" class="p-2">
+                        <i class="fa fa-shopping-cart text-[#284D67] text-2xl"></i>
+                    </button>
+
+                    <div id="dropdownCarrito" class="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 hidden z-50">
+                        <h3 class="font-bold text-gray-700">Carrito</h3>
+                        <ul id="listaCarrito" class="mt-3 space-y-1">
+                            @* Cargar inicial desde sesión *@
+                            @{
+                                var carrito = Context.Session.GetObjectFromJson<List<string>>("Carrito") ?? new List<string>();
+                                var total = Context.Session.GetString("Total") ?? "0";
+                            }
+                            @foreach (var item in carrito)
+                            {
+                                <li class="text-gray-800 text-sm border-b pb-1">@item</li>
+                            }
+                        </ul>
+                        <p class="mt-3 font-semibold text-gray-900">Total: $<span id="totalCarrito">@total</span></p>
+                        <a href="/Pago/index" class="mt-3 block bg-green-600 text-white text-center py-1 rounded hover:bg-green-700">
+                            Finalizar compra
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Icono usuario -->
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='%23284D67' viewBox='0 0 24 24'><path d='M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.314 0-10 1.657-10 5v3h20v-3c0-3.343-6.686-5-10-5z'/></svg>"
+                     class="w-7 ml-4 cursor-pointer">
+            </div>
+
+        </div>
+    </header>
+
+    <!-- CONTENIDO DOS COLUMNAS -->
+    <div class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
+
+        <!-- IZQUIERDA - ASIENTOS -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+
+            <h2 class="text-2xl font-bold mb-4">Selecciona tus asientos</h2>
+
+            <div class="flex justify-center mb-6">
+                <img src="@Model.Ruta.ImagenUrl"
+                     class="w-72 rounded-lg shadow-md"
+                     alt="Bus" />
+            </div>
+
+            <div class="grid grid-cols-4 gap-4 justify-items-center">
+                @foreach (var asiento in Model.Asientos)
+                {
+                    bool esPasillo = asiento.Codigo.EndsWith("3");
+                    if (esPasillo)
+                    {
+                        <div class="w-10"></div>
+                    }
+                    <button class="asiento w-12 h-12 rounded-lg text-sm font-bold flex items-center justify-center transition-all
+                   @(asiento.Disponible ? "bg-green-500 hover:bg-green-600 text-white" : "bg-gray-400 text-white cursor-not-allowed")"
+                            data-id="@asiento.AsientoId"
+                            data-codigo="@asiento.Codigo"
+                            @(asiento.Disponible ? "" : "disabled")>
+                        @asiento.Codigo
+                    </button>
+                }
+
+                }
+            </div>
+        </div>
+
+        <!-- DERECHA - INFORMACIÓN -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h1 class="text-4xl font-bold mb-4">
+                @Model.Ruta.Origen — @Model.Ruta.Destino
+            </h1>
+
+            <div class="space-y-2 text-gray-700">
+                <p>🚍 <span class="font-semibold">Empresa:</span> @Model.Ruta.Empresa</p>
+                <p>⏱ <span class="font-semibold">Duración:</span> @Model.Ruta.Duracion min</p>
+                <p>💵 <span class="font-semibold">Precio por asiento:</span> @Model.Ruta.Precio.ToString("N0") COP</p>
+            </div>
+
+            <h2 class="text-2xl font-bold mt-10">🧾 Resumen de compra</h2>
+            <p class="text-lg text-gray-700 mt-2">Total: <span id="total">0</span> COP</p>
+
+            <div class="mt-6">
+                @Html.AntiForgeryToken()
+                <button id="agregarCarrito"
+                        class="bg-[#284D67] text-white px-6 py-3 rounded-lg hover:bg-[#1f3a4d] transition shadow-md">
+                    Agregar al carrito
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        (() => {
+          let asientosSeleccionados = [];
+          const precioAsiento = parseInt("@Model.Ruta.Precio");
+          const formatoCOP = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0 });
+
+          function actualizarTotalUI() {
+            const total = asientosSeleccionados.length * precioAsiento;
+            document.getElementById('total').textContent = formatoCOP.format(total);
+          }
+
+          function initAsientos() {
+            document.querySelectorAll('.asiento').forEach(btn => {
+              btn.addEventListener('click', () => {
+                if (btn.hasAttribute('disabled')) return;
+                const id = btn.dataset.id;
+                const codigo = btn.dataset.codigo;
+                const existe = asientosSeleccionados.some(a => a.id === id);
+                if (existe) {
+                  asientosSeleccionados = asientosSeleccionados.filter(a => a.id !== id);
+                  btn.classList.remove('bg-blue-500');
+                  btn.classList.add('bg-green-500');
+                } else {
+                  asientosSeleccionados.push({ id, codigo });
+                  btn.classList.remove('bg-green-500');
+                  btn.classList.add('bg-blue-500');
+                }
+                actualizarTotalUI();
+              });
+            });
+          }
+
+          async function agregarAlCarrito() {
+            if (asientosSeleccionados.length === 0) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Debes seleccionar al menos un asiento.'
+              });
+              return;
+            }
+
+            try {
+              const dto = {
+                RutaId: @Model.Ruta.RutaId,
+                Asientos: asientosSeleccionados.map(a => ({ Id: a.id, Codigo: a.codigo }))
+              };
+
+              const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+              const response = await fetch('/Carrito/Agregar', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'RequestVerificationToken': token
+                },
+                body: JSON.stringify(dto)
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                // Actualizar carrito visualmente
+                const listaCarrito = document.getElementById('listaCarrito');
+                const totalCarrito = document.getElementById('totalCarrito');
+
+                listaCarrito.innerHTML = '';
+                dto.Asientos.forEach(a => {
+                  const li = document.createElement('li');
+                  li.textContent = a.Codigo;
+                  li.className = 'text-gray-800 text-sm border-b pb-1';
+                  listaCarrito.appendChild(li);
+                });
+
+                const total = dto.Asientos.length * precioAsiento;
+                totalCarrito.textContent = formatoCOP.format(total);
+
+                // ✅ SweetAlert2 éxito
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: result.mensaje,
+                  showConfirmButton: false,
+                  timer: 2000
+                });
+
+                // Limpiar selección visual
+                asientosSeleccionados = [];
+                document.querySelectorAll('.asiento').forEach(btn => {
+                  if (!btn.hasAttribute('disabled')) {
+                    btn.classList.remove('bg-blue-500');
+                    btn.classList.add('bg-green-500');
+                  }
+                });
+                actualizarTotalUI();
+
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: result.mensaje || 'Error al agregar los asientos al carrito'
+                });
+              }
+
+            } catch (err) {
+              console.error(err);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al agregar los asientos al carrito'
+              });
+            }
+          }
+
+          // Dropdown funcional
+          const btnCarrito = document.getElementById('btnCarrito');
+          const dropdownCarrito = document.getElementById('dropdownCarrito');
+
+          btnCarrito.addEventListener('click', () => {
+            dropdownCarrito.classList.toggle('hidden');
+          });
+
+          document.addEventListener('click', (e) => {
+            if (!btnCarrito.contains(e.target) && !dropdownCarrito.contains(e.target)) {
+              dropdownCarrito.classList.add('hidden');
+            }
+          });
+
+          document.addEventListener('DOMContentLoaded', () => {
+            initAsientos();
+            actualizarTotalUI();
+            document.getElementById('agregarCarrito').addEventListener('click', agregarAlCarrito);
+          });
+
+        })();
+    </script>
+
+
+</body>
+</html>

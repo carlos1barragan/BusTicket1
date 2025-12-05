@@ -1,0 +1,11 @@
+﻿@model string   // Puedes usar un modelo si quieres luego
+
+@using (Html.BeginForm("Crear", "Ruta", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <label>Imagen de la ruta</label>
+    <input type="file" name="ImagenRuta" class="border p-2 w-full" />
+
+    <button type="submit" class="bg-blue-600 text-white p-3 rounded mt-4">
+        Guardar
+    </button>
+}
